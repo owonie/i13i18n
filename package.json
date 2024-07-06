@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js --off"
+    "toff": "node main.js off",
+    "ton": "node main.js on"
   },
   "keywords": [],
   "author": "",

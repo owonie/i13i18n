@@ -71,7 +71,8 @@ function generateCodeFromAST(ast) {
   return generator(ast).code;
 }
 
-function largeComplicatedProcess(filePath) {
+function largeComplicatedProcess(filePath, mode) {
+  console.log('mode', mode);
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
       console.error('Where is the file???', err);
@@ -79,7 +80,7 @@ function largeComplicatedProcess(filePath) {
     }
 
     const ast = generateAST(data);
-    traverseAndTransformAST(ast, 'off');
+    traverseAndTransformAST(ast, mode);
 
     const generateCode = generateCodeFromAST(ast);
     console.log('Generated Code:', generateCode);
@@ -99,10 +100,10 @@ function largeComplicatedProcess(filePath) {
 
 const args = process.argv.slice(2);
 const filePath = 'test2.tsx';
-const mode = args.includes('--on')
+const mode = args.includes('on')
   ? 'on'
-    ? args.includes('--off')
-    : 'off'
+  : args.includes('off')
+  ? 'off'
   : 'error';
 
-largeComplicatedProcess(filePath);
+largeComplicatedProcess(filePath, mode);
