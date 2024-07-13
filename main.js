@@ -67,12 +67,16 @@ function installi18n(ast) {
   });
 }
 
-// traverseAndTransformAST(ast);
 function generateCodeFromAST(ast) {
   return generator(ast).code;
 }
 
-function largeComplicatedProcess(directoryPath, outputsPath, mode) {
+function largeComplicatedProcess(
+  directoryPath,
+  outputsPath,
+  targetExtension,
+  mode
+) {
   console.log('mode:', mode);
   console.log('direactory:', directoryPath);
   fs.readdir(directoryPath, 'utf8', (err, files) => {
@@ -95,8 +99,9 @@ function largeComplicatedProcess(directoryPath, outputsPath, mode) {
           }
 
           const ast = generateAST(data);
-          traverseAndTransformAST(ast, mode);
-
+          if (file.endsWith(targetExtension)) {
+            traverseAndTransformAST(ast, mode);
+          }
           const generateCode = generateCodeFromAST(ast);
 
           if (!fs.existsSync(outputsPath)) {
@@ -119,16 +124,14 @@ function largeComplicatedProcess(directoryPath, outputsPath, mode) {
   });
 }
 
-// const generatedCode = generateCodeFromAST(ast);
-// console.log('Generated Code:', generatedCode);
-
 const args = process.argv.slice(2);
 const directoryPath = './src';
 const outputsPath = './outputs';
+const targetExtension = '.t.tsx';
 const mode = args.includes('on')
   ? 'on'
   : args.includes('off')
   ? 'off'
   : 'error';
 
-largeComplicatedProcess(directoryPath, outputsPath, mode);
+largeComplicatedProcess(directoryPath, outputsPath, targetExtension, mode);
