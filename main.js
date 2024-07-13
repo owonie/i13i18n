@@ -116,24 +116,33 @@ function transpileFile(filePath, targetExtension, mode) {
       console.error('Where is the file???', err);
       return;
     }
-    const ast = generateAST(file);
     const fileExtension = getFullExtension(filePath);
 
-    if (fileExtension === targetExtension) {
-      console.log(informTextColor, `${filePath}`);
-      traverseAndTransformAST(ast, mode);
-    }
-    const generateCode = generateCodeFromAST(ast);
     const newFilePath = filePath.replace('src', 'outputs');
-
     const outputsFile = path.join(newFilePath);
-    fs.writeFileSync(outputsFile, generateCode, (err) => {
-      if (err) {
-        console.error('Error!!!! i cant write file anymore!!!', err);
-      } else {
-        console.log('Here is the best file ever~');
-      }
-    });
+
+    if (fileExtension !== targetExtension) {
+      fs.copyFile(filePath, outputsFile, (err) => {
+        if (err) {
+          console.error('Error copying file:', err);
+          return;
+        }
+      });
+      return;
+    } else {
+      console.log(informTextColor, `${filePath}`);
+
+      const ast = generateAST(file);
+      traverseAndTransformAST(ast, mode);
+      const generateCode = generateCodeFromAST(ast);
+      fs.writeFileSync(outputsFile, generateCode, (err) => {
+        if (err) {
+          console.error('Error!!!! i cant write file anymore!!!', err);
+        } else {
+          console.log('Here is the best file ever~');
+        }
+      });
+    }
   });
 }
 
@@ -158,8 +167,10 @@ const informTextColor = args.includes('on')
   : '\x1b[34m';
 
 const outputsPath = './outputs';
-if (!fs.existsSync(outputsPath)) {
-  fs.mkdirSync(outputsPath, { recursive: true });
+
+if (fs.existsSync(outputsPath)) {
+  fs.rmSync(outputsPath, { recursive: true, force: true });
 }
+fs.mkdirSync(outputsPath, { recursive: true });
 
 startTranspiling(directoryPath, targetExtension, mode);
