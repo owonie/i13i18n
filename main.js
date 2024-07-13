@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const parser = require('@babel/parser');
 const traverse = require('@babel/traverse').default;
 const generator = require('@babel/generator').default;
@@ -71,25 +72,48 @@ function generateCodeFromAST(ast) {
   return generator(ast).code;
 }
 
-function largeComplicatedProcess(filePath, mode) {
-  console.log('mode', mode);
-  fs.readFile(filePath, 'utf8', (err, data) => {
+function largeComplicatedProcess(directoryPath, outputsPath, mode) {
+  console.log('mode:', mode);
+  console.log('direactory:', directoryPath);
+  fs.readdir(directoryPath, 'utf8', (err, files) => {
     if (err) {
-      console.error('Where is the file???', err);
+      console.error('Where is the folder?', err);
       return;
     }
+    console.log('files:', files);
+    files.forEach((file) => {
+      console.log('file:', file);
+      const filePath = path.join(directoryPath, file);
 
-    const ast = generateAST(data);
-    traverseAndTransformAST(ast, mode);
+      if (fs.lstatSync(filePath).isFile()) {
+        console.log('filePath:', filePath);
 
-    const generateCode = generateCodeFromAST(ast);
-    console.log('Generated Code:', generateCode);
+        fs.readFile(filePath, 'utf8', (err, data) => {
+          if (err) {
+            console.error('Where is the file???', err);
+            return;
+          }
 
-    fs.writeFile('output.tsx', generateCode, (err) => {
-      if (err) {
-        console.error('Error!!!! i cant write file anymore!!!', err);
-      } else {
-        console.log('Here is the best file ever~');
+          const ast = generateAST(data);
+          traverseAndTransformAST(ast, mode);
+
+          const generateCode = generateCodeFromAST(ast);
+
+          if (!fs.existsSync(outputsPath)) {
+            fs.mkdirSync(outputsPath, {
+              recursive: true,
+            });
+          }
+          const outputsFile = path.join(outputsPath, file);
+
+          fs.writeFileSync(outputsFile, generateCode, (err) => {
+            if (err) {
+              console.error('Error!!!! i cant write file anymore!!!', err);
+            } else {
+              console.log('Here is the best file ever~');
+            }
+          });
+        });
       }
     });
   });
@@ -99,11 +123,12 @@ function largeComplicatedProcess(filePath, mode) {
 // console.log('Generated Code:', generatedCode);
 
 const args = process.argv.slice(2);
-const filePath = 'test2.tsx';
+const directoryPath = './src';
+const outputsPath = './outputs';
 const mode = args.includes('on')
   ? 'on'
   : args.includes('off')
   ? 'off'
   : 'error';
 
-largeComplicatedProcess(filePath, mode);
+largeComplicatedProcess(directoryPath, outputsPath, mode);
