@@ -18,7 +18,7 @@ function traverseAndTransformAST(ast, mode) {
   } else if (mode === 'on') {
     installi18n(ast);
   } else {
-    console.error('Nonoononono only --on and --off mode');
+    console.error(informTextColor, 'Nonoononono only --on and --off mode');
   }
 }
 
@@ -71,62 +71,79 @@ function generateCodeFromAST(ast) {
   return generator(ast).code;
 }
 
-function largeComplicatedProcess(
-  directoryPath,
-  outputsPath,
-  targetExtension,
-  mode
-) {
-  console.log('mode:', mode);
-  console.log('direactory:', directoryPath);
-  fs.readdir(directoryPath, 'utf8', (err, files) => {
+function traverseDirectories(currentPath, targetExtension, mode) {
+  fs.readdir(currentPath, (err, files) => {
     if (err) {
-      console.error('Where is the folder?', err);
+      return console.error('Wrong directory path!', err);
+    }
+    files.forEach((file) => {
+      const filePath = path.join(currentPath, file);
+      fs.lstat(filePath, (err, stats) => {
+        if (err) {
+          return console.error('wrong file path', err);
+        }
+        if (stats.isDirectory()) {
+          const newFolderPath = filePath.replace('src', 'outputs');
+          if (!fs.existsSync(newFolderPath)) {
+            fs.mkdirSync(newFolderPath, { recursive: true });
+          }
+          traverseDirectories(filePath, targetExtension, mode);
+        } else if (stats.isFile()) {
+          transpileFile(filePath, targetExtension, mode);
+        }
+      });
+    });
+  });
+}
+
+// 확장자 추출
+function getFullExtension(filePath) {
+  let ext = path.extname(filePath);
+  let baseName = path.basename(filePath, ext);
+
+  while (path.extname(baseName) !== '') {
+    ext = path.extname(baseName) + ext;
+    baseName = path.basename(baseName, path.extname(baseName));
+  }
+
+  return ext;
+}
+
+// 파일일 경우에만 확인
+function transpileFile(filePath, targetExtension, mode) {
+  fs.readFile(filePath, 'utf8', (err, file) => {
+    if (err) {
+      console.error('Where is the file???', err);
       return;
     }
-    console.log('files:', files);
-    files.forEach((file) => {
-      console.log('file:', file);
-      const filePath = path.join(directoryPath, file);
+    const ast = generateAST(file);
+    const fileExtension = getFullExtension(filePath);
 
-      if (fs.lstatSync(filePath).isFile()) {
-        console.log('filePath:', filePath);
+    if (fileExtension === targetExtension) {
+      console.log(informTextColor, `${filePath}`);
+      traverseAndTransformAST(ast, mode);
+    }
+    const generateCode = generateCodeFromAST(ast);
+    const newFilePath = filePath.replace('src', 'outputs');
 
-        fs.readFile(filePath, 'utf8', (err, data) => {
-          if (err) {
-            console.error('Where is the file???', err);
-            return;
-          }
-
-          const ast = generateAST(data);
-          if (file.endsWith(targetExtension)) {
-            traverseAndTransformAST(ast, mode);
-          }
-          const generateCode = generateCodeFromAST(ast);
-
-          if (!fs.existsSync(outputsPath)) {
-            fs.mkdirSync(outputsPath, {
-              recursive: true,
-            });
-          }
-          const outputsFile = path.join(outputsPath, file);
-
-          fs.writeFileSync(outputsFile, generateCode, (err) => {
-            if (err) {
-              console.error('Error!!!! i cant write file anymore!!!', err);
-            } else {
-              console.log('Here is the best file ever~');
-            }
-          });
-        });
+    const outputsFile = path.join(newFilePath);
+    fs.writeFileSync(outputsFile, generateCode, (err) => {
+      if (err) {
+        console.error('Error!!!! i cant write file anymore!!!', err);
+      } else {
+        console.log('Here is the best file ever~');
       }
     });
   });
 }
 
+function startTranspiling(currentPath, targetExtension, mode) {
+  console.log('mode:', 'translate', mode);
+  traverseDirectories(currentPath, targetExtension, mode);
+}
+
 const args = process.argv.slice(2);
 const directoryPath = './src';
-const outputsPath = './outputs';
 const targetExtension = '.t.tsx';
 const mode = args.includes('on')
   ? 'on'
@@ -134,4 +151,15 @@ const mode = args.includes('on')
   ? 'off'
   : 'error';
 
-largeComplicatedProcess(directoryPath, outputsPath, targetExtension, mode);
+const informTextColor = args.includes('on')
+  ? '\x1b[32m'
+  : args.includes('off')
+  ? '\x1b[31m'
+  : '\x1b[34m';
+
+const outputsPath = './outputs';
+if (!fs.existsSync(outputsPath)) {
+  fs.mkdirSync(outputsPath, { recursive: true });
+}
+
+startTranspiling(directoryPath, targetExtension, mode);
