@@ -2,3 +2,5 @@ node_modules
 outputs
 package-lock.json
 src
+
+i13i18n.config.json
