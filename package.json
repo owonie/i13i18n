@@ -16,7 +16,7 @@
     "localization",
     "translation",
     "automation",
-    "i18ntranspiler"
+    "i18n-transpiler"
   ],
   "author": "owonie",
   "license": "MIT",
