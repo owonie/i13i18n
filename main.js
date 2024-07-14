@@ -189,8 +189,7 @@ const informTextColor = args.includes('on')
 
 const config = loadConfig();
 console.log('debug', config);
-const { sourceDirectory, outputDirectory, transpileOptions, targetExtensions } =
-  config;
+const { sourceDirectory, outputDirectory, targetExtensions } = config;
 console.log('debug2', outputDirectory);
 
 main();

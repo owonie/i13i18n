@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "toff": "node main.js off",
-    "ton": "node main.js on"
+    "ton": "node main.js on",
+    "postinstall": "node scripts/postinstall.js"
   },
   "keywords": [],
   "author": "",
