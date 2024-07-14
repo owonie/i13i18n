@@ -1,7 +1,7 @@
 {
   "name": "i13i18n",
-  "version": "1.0.0",
-  "description": "I'm too lazy to use i18n.",
+  "version": "1.0.1",
+  "description": "I'm too lazy to use i18n. This module simplifies the process of internationalization, making it easy and straightforward to use without the hassle.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,9 +9,17 @@
     "ton": "node main.js on",
     "postinstall": "node scripts/postinstall.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "i18n",
+    "transpiler",
+    "internationalization",
+    "localization",
+    "translation",
+    "automation",
+    "i18ntranspiler"
+  ],
+  "author": "owonie",
+  "license": "MIT",
   "dependencies": {
     "@babel/generator": "^7.24.7",
     "@babel/parser": "^7.24.7",
