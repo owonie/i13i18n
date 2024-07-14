@@ -24,14 +24,16 @@ This package supports configuration via a i13i18n.config.json file. Here is an e
 ```json
 {
   "sourceDirectory": "./src",
-  "outputDirectory": "./dist",
+  "outputDirectory": "./outputs",
   "transpileOptions": {
     "presets": ["@babel/preset-env"],
     "plugins": []
   },
-  "fileExtensions": [".js", ".jsx"],
+  "targetExtensions": [".t.jsx", ".t.tsx"],
   "exclude": ["node_modules"]
 }
 ```
 
 ### License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
