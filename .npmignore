@@ -1,0 +1,10 @@
+node_modules
+
+src
+outputs
+
+.git
+.gitignore
+
+i13i18n.config.json
+package-lock.json
