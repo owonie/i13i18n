@@ -96,7 +96,6 @@ function traverseDirectories(currentPath) {
   });
 }
 
-// 확장자 추출
 function getFullExtension(filePath) {
   let ext = path.extname(filePath);
   let baseName = path.basename(filePath, ext);
@@ -109,7 +108,6 @@ function getFullExtension(filePath) {
   return ext;
 }
 
-// 파일일 경우에만 확인
 function transpileFile(filePath) {
   fs.readFile(filePath, 'utf8', (err, file) => {
     if (err) {
@@ -163,10 +161,6 @@ function loadConfig() {
 }
 
 function main() {
-  // const directoryPath = './src';
-  // const targetExtension = '.t.tsx';
-  // const outputsPath = './outputs';
-
   if (fs.existsSync(outputDirectory)) {
     fs.rmSync(outputDirectory, { recursive: true, force: true });
   }
