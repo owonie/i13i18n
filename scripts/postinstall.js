@@ -8,8 +8,7 @@ const defaultConfig = {
     presets: ['@babel/preset-env'],
     plugins: [],
   },
-  fileExtensions: ['.t.jsx', '.t.tsx'],
-  exclude: ['node_modules'],
+  targetExtensions: ['.t.jsx', '.t.tsx'],
 };
 
 const configPath = path.resolve(process.cwd(), 'i13i18n.config.json');

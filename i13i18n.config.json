@@ -1,15 +1,15 @@
 {
   "sourceDirectory": "./src",
-  "outputDirectory": "./dist",
+  "outputDirectory": "./outputs",
   "transpileOptions": {
     "presets": [
       "@babel/preset-env"
     ],
     "plugins": []
   },
-  "fileExtensions": [
-    ".js",
-    ".jsx"
+  "targetExtensions": [
+    ".t.jsx",
+    ".t.tsx"
   ],
   "exclude": [
     "node_modules"
