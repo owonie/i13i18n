@@ -139,8 +139,6 @@ function transpileFile(filePath) {
       fs.writeFileSync(outputsFile, generateCode, (err) => {
         if (err) {
           console.error('Error!!!! i cant write file anymore!!!', err);
-        } else {
-          console.log('Here is the best file ever~');
         }
       });
     }
@@ -182,8 +180,6 @@ const informTextColor = args.includes('on')
   : '\x1b[34m';
 
 const config = loadConfig();
-console.log('debug', config);
 const { sourceDirectory, outputDirectory, targetExtensions } = config;
-console.log('debug2', outputDirectory);
 
 main();
