@@ -12,7 +12,7 @@ function generateAST(code) {
   });
 }
 
-function traverseAndTransformAST(ast, mode) {
+function traverseAndTransformAST(ast) {
   if (mode === 'off') {
     removei18n(ast);
   } else if (mode === 'on') {
@@ -71,7 +71,7 @@ function generateCodeFromAST(ast) {
   return generator(ast).code;
 }
 
-function traverseDirectories(currentPath, targetExtension, mode) {
+function traverseDirectories(currentPath) {
   fs.readdir(currentPath, (err, files) => {
     if (err) {
       return console.error('Wrong directory path!', err);
@@ -87,9 +87,9 @@ function traverseDirectories(currentPath, targetExtension, mode) {
           if (!fs.existsSync(newFolderPath)) {
             fs.mkdirSync(newFolderPath, { recursive: true });
           }
-          traverseDirectories(filePath, targetExtension, mode);
+          traverseDirectories(filePath);
         } else if (stats.isFile()) {
-          transpileFile(filePath, targetExtension, mode);
+          transpileFile(filePath);
         }
       });
     });
@@ -110,7 +110,7 @@ function getFullExtension(filePath) {
 }
 
 // 파일일 경우에만 확인
-function transpileFile(filePath, targetExtension, mode) {
+function transpileFile(filePath) {
   fs.readFile(filePath, 'utf8', (err, file) => {
     if (err) {
       console.error('Where is the file???', err);
@@ -118,10 +118,13 @@ function transpileFile(filePath, targetExtension, mode) {
     }
     const fileExtension = getFullExtension(filePath);
 
-    const newFilePath = filePath.replace('src', 'outputs');
+    const newFilePath = filePath.replace(
+      sourceDirectory.slice(2),
+      outputDirectory.slice(2)
+    );
     const outputsFile = path.join(newFilePath);
 
-    if (fileExtension !== targetExtension) {
+    if (!targetExtensions.includes(fileExtension)) {
       fs.copyFile(filePath, outputsFile, (err) => {
         if (err) {
           console.error('Error copying file:', err);
@@ -146,14 +149,32 @@ function transpileFile(filePath, targetExtension, mode) {
   });
 }
 
-function startTranspiling(currentPath, targetExtension, mode) {
+function startTranspiling(currentPath) {
   console.log('mode:', 'translate', mode);
-  traverseDirectories(currentPath, targetExtension, mode);
+  traverseDirectories(currentPath);
+}
+
+function loadConfig() {
+  const configPath = path.resolve(process.cwd(), 'i13i18n.config.json');
+  if (!fs.existsSync(configPath)) {
+    throw new Error(`Config File Not Found! ${configPath}`);
+  }
+  return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+}
+
+function main() {
+  // const directoryPath = './src';
+  // const targetExtension = '.t.tsx';
+  // const outputsPath = './outputs';
+
+  if (fs.existsSync(outputDirectory)) {
+    fs.rmSync(outputDirectory, { recursive: true, force: true });
+  }
+  fs.mkdirSync(outputDirectory, { recursive: true });
+  startTranspiling(sourceDirectory);
 }
 
 const args = process.argv.slice(2);
-const directoryPath = './src';
-const targetExtension = '.t.tsx';
 const mode = args.includes('on')
   ? 'on'
   : args.includes('off')
@@ -166,11 +187,10 @@ const informTextColor = args.includes('on')
   ? '\x1b[31m'
   : '\x1b[34m';
 
-const outputsPath = './outputs';
+const config = loadConfig();
+console.log('debug', config);
+const { sourceDirectory, outputDirectory, transpileOptions, targetExtensions } =
+  config;
+console.log('debug2', outputDirectory);
 
-if (fs.existsSync(outputsPath)) {
-  fs.rmSync(outputsPath, { recursive: true, force: true });
-}
-fs.mkdirSync(outputsPath, { recursive: true });
-
-startTranspiling(directoryPath, targetExtension, mode);
+main();

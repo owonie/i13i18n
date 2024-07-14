@@ -1,0 +1,10 @@
+{
+  "sourceDirectory": "./src",
+  "outputDirectory": "./outputs",
+  "transpileOptions": {
+    "presets": ["@babel/preset-env"],
+    "plugins": []
+  },
+  "targetExtensions": [".t.tsx", ".t.jsx"],
+  "exclude": ["node_modules"]
+}
